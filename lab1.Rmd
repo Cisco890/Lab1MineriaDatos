@@ -34,6 +34,71 @@ library(pheatmap) #Para hacer mapa de calor
 
 ```{r carga_datos}
 movies <- read.csv("movies_2026.csv")
+head(movies)
 
 ```
-### Descripción del conjunto de Datos
+### Pregunta 1:  Exploración rápida de los Datos
+
+#Dimensiones
+```{r}
+nrow(movies) #númdro de Filas 
+ncol(movies) #número de Columnas
+dim(movies) #dimensión del Data Set
+
+
+names(movies) # Nombres de columna
+
+
+str(movies) # Estructura (tipos de datos)
+
+
+summary(movies) # Resumen rápido (por defecto)
+```
+#Datos Faltantes y Duplicados
+```{r}
+# Cantidad de NA por columna
+na_conteo <- colSums(is.na(movies))
+
+# Porcentaje de NA por columna
+na_porcentaje <- round(colMeans(is.na(movies)) * 100, 2)
+
+# Tabla resumen de faltantes
+faltantes <- data.frame(
+  variable = names(movies),
+  na = as.vector(na_conteo),
+  na_pct = as.vector(na_porcentaje)
+)
+
+
+head(faltantes, 15)  # Top 15 columnas con más NA
+
+# Duplicados (filas repetidas)
+sum(duplicated(datos))
+
+```
+#Resumen de variables Numéricas
+```{r}
+# Detectar columnas numéricas
+num_cols <- sapply(movies, is.numeric)
+datos_num <- movies[, num_cols]
+
+# Resumen estadístico simple por variable numérica
+res_num <- data.frame(
+  variable = names(datos_num),
+  media = sapply(datos_num, mean, na.rm = TRUE),
+  mediana = sapply(datos_num, median, na.rm = TRUE),
+  sd = sapply(datos_num, sd, na.rm = TRUE),
+  min = sapply(datos_num, min, na.rm = TRUE),
+  max = sapply(datos_num, max, na.rm = TRUE)
+)
+
+head(res_num)
+
+```
+#variables Categóricas
+```{r}
+cat_cols <- sapply(movies, is.character) | sapply(movies, is.factor)
+names(movies[, cat_cols])
+```
+
+
