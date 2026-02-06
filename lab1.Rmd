@@ -416,4 +416,83 @@ ggplot(top10_gan, aes(x = reorder(main_genre, ganancia_promedio), y = ganancia_p
     plot.title = element_text(face = "bold")
   )
 ```
+#### Análisis de actores
+```{r}
+##limpiar datos
+df_actores_ing <- movies %>%
+  filter(!is.na(actorsAmount), !is.na(revenue)) %>%
+  filter(actorsAmount > 0, revenue > 0)
+
+summary(df_actores_ing$actorsAmount)
+summary(df_actores_ing$revenue)
+```
+```{r}
+##gráfico de relación entre cantidad de actores e ingresos
+ggplot(df_actores_ing, aes(x = actorsAmount, y = revenue)) +
+  geom_point(alpha = 0.3) +
+  scale_y_log10() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Relación entre cantidad de actores e ingresos",
+    subtitle = "Eje Y en escala log10 (revenue)",
+    x = "Cantidad de actores (actorsAmount)",
+    y = "Ingresos (revenue)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold"))
+```
+
+
+```{r}
+##Actores por año
+df_actores_anio <- movies %>%
+  filter(!is.na(releaseYear), !is.na(actorsAmount)) %>%
+  mutate(releaseYear = as.integer(releaseYear)) %>%
+  filter(actorsAmount > 0)
+
+actores_por_anio <- df_actores_anio %>%
+  group_by(releaseYear) %>%
+  summarise(
+    peliculas = n(),
+    promedio_actores = mean(actorsAmount, na.rm = TRUE),
+    mediana_actores = median(actorsAmount, na.rm = TRUE)
+  ) %>%
+  arrange(releaseYear)
+
+actores_por_anio
+```
+```{r}
+##Gráfico de tendencia
+ggplot(actores_por_anio, aes(x = releaseYear, y = mediana_actores)) +
+  geom_line() +
+  geom_point(size = 1) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "¿Han aumentado los actores en películas con el tiempo?",
+    subtitle = "Mediana de actorsAmount por año + tendencia lineal",
+    x = "Año",
+    y = "Mediana de actores"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold"))
+```
+```{r}
+##Comparación de los últimos años con años recientes
+max_anio <- max(df_actores_anio$releaseYear, na.rm = TRUE)
+corte <- max_anio - 5
+
+comparacion <- df_actores_anio %>%
+  mutate(periodo = ifelse(releaseYear >= corte, "Últimos 5 años", "Años anteriores")) %>%
+  group_by(periodo) %>%
+  summarise(
+    peliculas = n(),
+    promedio_actores = mean(actorsAmount, na.rm = TRUE),
+    mediana_actores = median(actorsAmount, na.rm = TRUE)
+  )
+
+corte
+comparacion
+```
 
