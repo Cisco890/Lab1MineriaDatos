@@ -26,6 +26,7 @@ library(hopkins) #Para revisar si vale la pena hacer agrupamiento
 library(GGally) #Para hacer el conjunto de graficos
 library(FeatureImpCluster) #Para revisar la importancia de las variables en los grupos.
 library(pheatmap) #Para hacer mapa de calor
+library(scales)  #Para las escalas de la gráficas
 ```
 
 #  Análisis exploratorio de Datos
@@ -203,5 +204,60 @@ pelicula_mas_votos <- movies %>%
   head(1)
 
 pelicula_mas_votos
+```
+### Película con menos votos
+```{r}
+peliculas_0_votos <- movies %>%
+  filter(!is.na(voteCount), voteCount == 0) %>%
+  select(title, voteCount, voteAvg, releaseYear)
+
+peliculas_0_votos
+
+min_votos_pos <- movies %>%
+  filter(!is.na(voteCount), voteCount > 0) %>%
+  summarise(min_voteCount = min(voteCount)) %>%
+  pull(min_voteCount)
+
+peliculas_menos_votos_con_voto <- movies %>%
+  filter(!is.na(voteCount), voteCount == min_votos_pos) %>%
+  select(title, voteCount, voteAvg, releaseYear)
+
+min_votos_pos
+peliculas_menos_votos_con_voto
+```
+###Películas por año
+```{r}
+peliculas_por_anio <- movies %>%
+  filter(!is.na(releaseYear)) %>%
+  mutate(releaseYear = as.integer(releaseYear)) %>%
+  count(releaseYear, name = "cantidad") %>%
+  arrange(releaseYear)
+
+anio_mas <- peliculas_por_anio %>%
+  slice_max(cantidad, n = 1, with_ties = FALSE)
+
+ggplot(peliculas_por_anio, aes(x = releaseYear, y = cantidad)) +
+  geom_col(width = 0.85) +
+  geom_text(
+    data = anio_mas,
+    aes(label = paste0("Máximo: ", releaseYear, "\n(", comma(cantidad), ")")),
+    vjust = -0.4,
+    size = 3.5
+  ) +
+  scale_x_continuous(
+    breaks = seq(min(pelis_por_anio$releaseYear), max(pelis_por_anio$releaseYear), by = 5)
+  ) +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title = "Cantidad de películas por año",
+    x = "Año",
+    y = "Cantidad de películas"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(face = "bold")
+  )
 ```
 
