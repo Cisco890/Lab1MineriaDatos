@@ -667,6 +667,90 @@ mes_mejor
 kruskal.test(revenue ~ mes, data = df_mes)
 
 ```
+####Mes con lanzamientos y mejores ingresos
+```{r}
+##limpiar datos
+movies2 <- movies %>%
+  mutate(
+    release_dt = suppressWarnings(ymd(releaseDate)),
+    release_dt = ifelse(is.na(release_dt) & !is.na(releaseYear),
+                        as.Date(paste0(releaseYear, "-12-31")),
+                        release_dt) %>% as.Date(),
+    mes = factor(month(release_dt, label = TRUE, abbr = TRUE),
+                 levels = month(1:12, label = TRUE, abbr = TRUE))
+  )
+
+```
+```{r}
+##tabla de ingresos por mes
+df_rev_mes <- movies2 %>%
+  filter(!is.na(release_dt), !is.na(revenue), revenue > 0)
+
+ingresos_por_mes <- df_rev_mes %>%
+  group_by(mes) %>%
+  summarise(
+    peliculas_con_revenue = n(),
+    revenue_mediana = median(revenue, na.rm = TRUE),
+    revenue_promedio = mean(revenue, na.rm = TRUE)
+  ) %>%
+  arrange(desc(revenue_mediana))
+
+ingresos_por_mes
+
+```
+```{r}
+##top 3 mejores meses
+top3_meses <- ingresos_por_mes %>% head(3)
+top3_meses
+```
+```{r}
+##Gráfico de ingresos por mes
+ggplot(ingresos_por_mes, aes(x = mes, y = revenue_mediana)) +
+  geom_col() +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title = "Mediana de ingresos (revenue) por mes de lanzamiento",
+    x = "Mes",
+    y = "Mediana de ingresos"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold")
+  )
+```
+```{r}
+## promedio de películas por mes
+lanz_por_anio_mes <- movies2 %>%
+  filter(!is.na(release_dt)) %>%
+  mutate(anio = year(release_dt)) %>%
+  count(anio, mes, name = "peliculas")
+
+promedio_por_mes_del_anio <- lanz_por_anio_mes %>%
+  group_by(mes) %>%
+  summarise(
+    promedio_peliculas = mean(peliculas),
+    mediana_peliculas = median(peliculas)
+  ) %>%
+  arrange(desc(promedio_peliculas))
+
+promedio_por_mes_del_anio
+```
+```{r}
+##gráfico
+ggplot(promedio_por_mes_del_anio, aes(x = mes, y = promedio_peliculas)) +
+  geom_col() +
+  labs(
+    title = "Promedio de peliculas lanzadas por mes del anno",
+    x = "Mes",
+    y = "Promedio de peliculas"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold")
+  )
+```
 
 
 
