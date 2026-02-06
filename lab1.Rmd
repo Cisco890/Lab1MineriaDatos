@@ -132,7 +132,6 @@ vars_cual
 ```
 ##normalizar
 ```{r}
-library(dplyr)
 
 set.seed(123)
 
@@ -172,5 +171,37 @@ normalidad <- bind_rows(normalidad_list) %>%
   arrange(p_value)
 
 normalidad
+```
+##Pregunta 4
+
+###Top 10 películas con más presupuesto
+```{r}
+top10_budget <- movies %>%
+  filter(!is.na(budget)) %>%
+  arrange(desc(budget)) %>%
+  select(title, budget, revenue, releaseYear) %>%
+  head(10)
+
+top10_budget
+```
+###Top 10 películas con más ingresos
+```{r}
+top10_revenue <- movies %>%
+  filter(!is.na(revenue)) %>%
+  arrange(desc(revenue)) %>%
+  select(title, revenue, budget, releaseYear) %>%
+  head(10)
+
+top10_revenue
+```
+### Película con más votos
+```{r}
+pelicula_mas_votos <- movies %>%
+  filter(!is.na(voteCount)) %>%
+  arrange(desc(voteCount)) %>%
+  select(title, voteCount, voteAvg, revenue, budget, releaseYear) %>%
+  head(1)
+
+pelicula_mas_votos
 ```
 
