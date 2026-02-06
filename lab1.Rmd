@@ -27,6 +27,8 @@ library(GGally) #Para hacer el conjunto de graficos
 library(FeatureImpCluster) #Para revisar la importancia de las variables en los grupos.
 library(pheatmap) #Para hacer mapa de calor
 library(scales)  #Para las escalas de la gráficas
+library(lubridate)#para las fechas
+
 ```
 
 #  Análisis exploratorio de Datos
@@ -257,6 +259,111 @@ ggplot(peliculas_por_anio, aes(x = releaseYear, y = cantidad)) +
   theme(
     panel.grid.minor = element_blank(),
     axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(face = "bold")
+  )
+```
+###Género de películas
+```{r}
+movies2 <- movies %>%
+  mutate(
+    # Género principal = primer género antes del "|"
+    main_genre = ifelse(is.na(genres) | genres == "", "Sin género", sub("\\|.*", "", genres)),
+    
+    # Parsear releaseDate (si viene en formato tipo "YYYY-MM-DD")
+    release_dt = suppressWarnings(ymd(releaseDate)),
+    
+    # Si no se pudo parsear releaseDate, usar releaseYear como fallback (31 dic de ese año)
+    release_dt = ifelse(is.na(release_dt) & !is.na(releaseYear),
+                        as.Date(paste0(releaseYear, "-12-31")),
+                        release_dt) %>% as.Date()
+  )
+
+
+```
+####top 20 películas más recientes
+```{r}
+top20_recientes <- movies2 %>%
+  filter(!is.na(release_dt)) %>%
+  arrange(desc(release_dt)) %>%
+  select(title, releaseYear, releaseDate, main_genre, runtime) %>%
+  head(20)
+
+top20_recientes
+```
+####Género predominante
+```{r}
+freq_genero <- movies2 %>%
+  count(main_genre, sort = TRUE) %>%
+  mutate(porcentaje = round(100*n/sum(n), 2))
+
+freq_genero
+
+
+```
+####Género predominante
+```{r}
+genero_predominante <- freq_genero %>% head(1)
+genero_predominante
+```
+####Gráfico de top 15 géneros
+```{r}
+freq_top15 <- freq_genero %>% head(15)
+
+ggplot(freq_top15, aes(x = reorder(main_genre, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Top 15 géneros más frecuentes",
+    x = "Género principal",
+    y = "Cantidad de películas"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold")
+  )
+```
+####Películas más largas 
+```{r}
+top20_largas <- movies2 %>%
+  filter(!is.na(runtime), runtime > 0) %>%
+  arrange(desc(runtime)) %>%
+  select(title, runtime, releaseYear, main_genre) %>%
+  head(20)
+
+top20_largas
+```
+####Género de las películas más largas
+```{r}
+top50_largas <- movies2 %>%
+  filter(!is.na(runtime), runtime > 0) %>%
+  arrange(desc(runtime)) %>%
+  head(50)
+
+freq_genero_largas <- top50_largas %>%
+  count(main_genre, sort = TRUE) %>%
+  mutate(porcentaje = round(100*n/sum(n), 2))
+
+freq_genero_largas
+```
+####Género predominante en las más largas
+```{r}
+genero_top_largas <- freq_genero_largas %>% head(1)
+genero_top_largas
+```
+####Gráfico de los géneros predominantes en las películas más largas
+```{r}
+ggplot(freq_genero_largas, aes(x = reorder(main_genre, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Género principal en las 50 películas más largas",
+    x = "Género principal",
+    y = "Cantidad"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
     plot.title = element_text(face = "bold")
   )
 ```
