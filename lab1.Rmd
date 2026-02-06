@@ -751,6 +751,54 @@ ggplot(promedio_por_mes_del_anio, aes(x = mes, y = promedio_peliculas)) +
     plot.title = element_text(face = "bold")
   )
 ```
+####4.14
+```{r}
+##preparar datos
+df_calif <- movies %>%
+  filter(!is.na(voteAvg), !is.na(voteCount), !is.na(revenue)) %>%
+  filter(voteAvg > 0, revenue > 0) %>%
+  filter(voteCount >= 100)   
+
+summary(df_calif$voteAvg)
+summary(df_calif$revenue)
+summary(df_calif$voteCount)
+
+```
+```{r}
+##correlacion
+cor_spear <- cor.test(df_calif$voteAvg, df_calif$revenue, method = "spearman")
+cor_spear
+```
+```{r}
+##grafico
+ggplot(df_calif, aes(x = voteAvg, y = revenue)) +
+  geom_point(alpha = 0.25) +
+  scale_y_log10(labels = comma) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Calificación vs exito comercial",
+    subtitle = "Eje Y en log10 (revenue) y línea de tendencia",
+    x = "Calificación promedio (voteAvg)",
+    y = "Ingresos (revenue)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold")
+  )
+
+```
+```{r}
+## exito como gancia
+df_gan <- movies %>%
+  filter(!is.na(voteAvg), !is.na(voteCount), !is.na(revenue), !is.na(budget)) %>%
+  filter(voteAvg > 0, revenue > 0, budget > 0) %>%
+  filter(voteCount >= 100) %>%
+  mutate(ganancia = revenue - budget)
+
+cor_gan <- cor.test(df_gan$voteAvg, df_gan$ganancia, method = "spearman")
+cor_gan
+```
 
 
 
