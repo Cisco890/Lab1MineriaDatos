@@ -1,8 +1,11 @@
 ---
-title: "cars16_1_26"
+title: "Lab 1"
 output: html_document
 date: "2026-01-16"
 author: "Mario Fernando Rocha 23501, Luis Pedro Lira 23669,Juan Francisco Martínez 23617"
+```{r}
+
+```
 
 ---
 ```{r}
@@ -495,6 +498,134 @@ comparacion <- df_actores_anio %>%
 corte
 comparacion
 ```
+###Cantidad de hombres y mujeres en las películas
+```{r}
+##preparar datos
+df_cast <- movies %>%
+  filter(!is.na(castWomenAmount), !is.na(castMenAmount)) %>%
+  mutate(
+    cast_total = castWomenAmount + castMenAmount,
+    pct_women = ifelse(cast_total > 0, castWomenAmount / cast_total, NA)
+  ) %>%
+  filter(!is.na(pct_women), cast_total > 0)
+
+summary(df_cast$castWomenAmount)
+summary(df_cast$castMenAmount)
+summary(df_cast$pct_women)
+```
+```{r}
+# Popularidad vs cantidad de mujeres/hombres y proporción
+cor_pop_women <- cor.test(df_cast$castWomenAmount, df_cast$popularity, method = "spearman")
+cor_pop_men   <- cor.test(df_cast$castMenAmount,   df_cast$popularity, method = "spearman")
+cor_pop_pctw  <- cor.test(df_cast$pct_women,       df_cast$popularity, method = "spearman")
+
+cor_pop_women
+cor_pop_men
+cor_pop_pctw
+```
+```{r}
+ggplot(df_cast, aes(x = pct_women, y = popularity)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Proporción de mujeres en el cast vs popularidad",
+    x = "Proporción de mujeres (castWomenAmount / total)",
+    y = "Popularidad"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold"))
+```
+```{r}
+df_cast_rev <- df_cast %>%
+  filter(!is.na(revenue), revenue > 0)
+
+summary(df_cast_rev$revenue)
+```
+```{r}
+cor_rev_women <- cor.test(df_cast_rev$castWomenAmount, df_cast_rev$revenue, method = "spearman")
+cor_rev_men   <- cor.test(df_cast_rev$castMenAmount,   df_cast_rev$revenue, method = "spearman")
+cor_rev_pctw  <- cor.test(df_cast_rev$pct_women,       df_cast_rev$revenue, method = "spearman")
+
+cor_rev_women
+cor_rev_men
+cor_rev_pctw
+```
+####20 mejores actores según las películas
+```{r}
+top20_mejor_calif <- movies %>%
+  filter(!is.na(voteAvg), !is.na(voteCount)) %>%
+  filter(voteCount >= 100) %>%   # puedes cambiar 100 por 50 o 200
+  arrange(desc(voteAvg), desc(voteCount)) %>%
+  select(title, director, voteAvg, voteCount, releaseYear) %>%
+  head(20)
+
+top20_mejor_calif
+```
+```{r}
+directores_top20 <- top20_mejor_calif %>%
+  distinct(director)
+
+directores_top20
+```
+####Correlación de presupuestos con ingresos
+```{r}
+##limpiar datos
+df_br <- movies %>%
+  filter(!is.na(budget), !is.na(revenue)) %>%
+  filter(budget > 0, revenue > 0)
+
+summary(df_br$budget)
+summary(df_br$revenue)
+```
+```{r}
+##histograma
+ggplot(df_br, aes(x = budget)) +
+  geom_histogram(bins = 30) +
+  labs(title = "Histograma de Presupuesto (budget)", x = "Budget", y = "Frecuencia") +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold"))
+```
+```{r}
+ggplot(df_br, aes(x = revenue)) +
+  geom_histogram(bins = 30) +
+  labs(title = "Histograma de Ingresos (revenue)", x = "Revenue", y = "Frecuencia") +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold"))
+```
+```{r}
+ggplot(df_br, aes(x = log10(revenue))) +
+  geom_histogram(bins = 30) +
+  labs(title = "Histograma de log10(Ingresos)", x = "log10(Revenue)", y = "Frecuencia") +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold"))
+```
+```{r}
+ggplot(df_br, aes(x = budget, y = revenue)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Presupuesto vs Ingresos (escala normal)",
+    x = "Budget",
+    y = "Revenue"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold"))
+```
+
+
+
+
+
+
+
+
+
+
 
 ## 5. Análisis Exploratorio Adicional
 En esta sección se plantean seis preguntas adicionales con el objetivo de explorar patrones
