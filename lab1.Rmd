@@ -799,7 +799,94 @@ df_gan <- movies %>%
 cor_gan <- cor.test(df_gan$voteAvg, df_gan$ganancia, method = "spearman")
 cor_gan
 ```
+###4.15
+```{r}
+##limpieza de datos
+movies_mkt <- movies %>%
+  mutate(
+    tiene_video = ifelse(is.na(video), FALSE, video),
+    tiene_homepage = ifelse(is.na(homePage) | homePage == "", FALSE, TRUE),
+    estrategia = case_when(
+      tiene_video == FALSE & tiene_homepage == FALSE ~ "Ninguna",
+      tiene_video == TRUE  & tiene_homepage == FALSE ~ "Solo video",
+      tiene_video == FALSE & tiene_homepage == TRUE  ~ "Solo homepage",
+      tiene_video == TRUE  & tiene_homepage == TRUE  ~ "Video + homepage"
+    )
+  )
+table(movies_mkt$estrategia)
 
+```
+
+```{r}
+##popularidad de las estrategias
+res_pop <- movies_mkt %>%
+  filter(!is.na(popularity)) %>%
+  group_by(estrategia) %>%
+  summarise(
+    peliculas = n(),
+    pop_mediana = median(popularity, na.rm = TRUE),
+    pop_promedio = mean(popularity, na.rm = TRUE)
+  ) %>%
+  arrange(desc(pop_mediana))
+
+res_pop
+```
+```{r}
+res_rev <- movies_mkt %>%
+  filter(!is.na(revenue), revenue > 0) %>%
+  group_by(estrategia) %>%
+  summarise(
+    peliculas = n(),
+    rev_mediana = median(revenue, na.rm = TRUE),
+    rev_promedio = mean(revenue, na.rm = TRUE)
+  ) %>%
+  arrange(desc(rev_mediana))
+
+res_rev
+
+```
+```{r}
+##grafico de popularidad por estrategia
+ggplot(movies_mkt, aes(x = estrategia, y = log1p(popularity))) +
+  geom_boxplot(outlier.alpha = 0.2) +
+  labs(
+    title = "Popularidad por estrategia de marketing",
+    subtitle = "Se usa log(1+popularity) para estabilizar la escala",
+    x = "Estrategia",
+    y = "log(1 + popularity)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        axis.text.x = element_text(angle = 25, hjust = 1),
+        plot.title = element_text(face = "bold"))
+```
+```{r}
+##grafico de ingresos por estrategia
+df_rev_plot <- movies_mkt %>%
+  filter(!is.na(revenue), revenue > 0)
+
+ggplot(df_rev_plot, aes(x = estrategia, y = revenue)) +
+  geom_boxplot(outlier.alpha = 0.2) +
+  scale_y_log10(labels = comma) +
+  labs(
+    title = "Ingresos por estrategia de marketing",
+    subtitle = "Eje Y en escala log10 (revenue)",
+    x = "Estrategia",
+    y = "Ingresos (revenue)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        axis.text.x = element_text(angle = 25, hjust = 1),
+        plot.title = element_text(face = "bold"))
+```
+```{r}
+kruskal.test(popularity ~ estrategia, data = movies_mkt)
+
+```
+```{r}
+kruskal.test(revenue ~ estrategia, data = df_rev_plot)
+
+```
 
 
 
