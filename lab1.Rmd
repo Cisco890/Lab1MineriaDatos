@@ -174,3 +174,151 @@ normalidad <- bind_rows(normalidad_list) %>%
 normalidad
 ```
 
+```{r}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+
+```
+
+
+```{r}
+str(movies)
+summary(movies)
+```
+
+
+## 5. Análisis Exploratorio Adicional
+En esta sección se plantean seis preguntas adicionales con el objetivo de explorar patrones
+complementarios en el conjunto de datos, sin repetir los análisis realizados en los incisos
+anteriores.
+
+```{r}
+movies_clean <- movies %>%
+  filter(
+    !is.na(revenue),
+    !is.na(popularity),
+    !is.na(runtime),
+    !is.na(productionCountriesAmount),
+    !is.na(genresAmount),
+    !is.na(productionCoAmount),
+    !is.na(castWomenAmount),
+    !is.na(castMenAmount),
+    !is.na(originalLanguage),
+    !is.na(releaseYear)
+  )
+```
+
+
+### 5.1 ¿Existe diferencia en los ingresos según la cantidad de países de producción?
+```{r}
+ggplot(movies_clean, aes(x = factor(productionCountriesAmount), y = revenue)) +
+  geom_boxplot() +
+  labs(
+    x = "Cantidad de países de producción",
+    y = "Ingresos",
+    title = "Ingresos según cantidad de países de producción"
+  ) +
+  theme_minimal()
+```
+
+### 5.2 ¿La cantidad de géneros influye en la popularidad y calificación de las películas?
+```{r}
+ggplot(movies_clean, aes(x = genresAmount, y = popularity)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    x = "Cantidad de géneros",
+    y = "Popularidad",
+    title = "Relación entre cantidad de géneros y popularidad"
+  ) +
+  theme_minimal()
+```
+### 5.3 ¿Cómo ha cambiado la duración promedio de las películas a lo largo del tiempo?
+
+```{r}
+runtime_year <- movies_clean %>%
+  group_by(releaseYear) %>%
+  summarise(runtime_promedio = mean(runtime))
+
+ggplot(runtime_year, aes(x = releaseYear, y = runtime_promedio)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    x = "Año de lanzamiento",
+    y = "Duración promedio (minutos)",
+    title = "Evolución de la duración promedio de las películas"
+  ) +
+  theme_minimal()
+```
+
+### 5.4 ¿Las películas con más compañías productoras generan mayores ingresos?
+```{r}
+ggplot(movies_clean, aes(x = factor(productionCoAmount), y = revenue)) +
+  geom_boxplot() +
+  labs(
+    x = "Cantidad de compañías productoras",
+    y = "Ingresos",
+    title = "Ingresos según número de compañías productoras"
+  ) +
+  theme_minimal()
+```
+### 5.5 ¿Existen diferencias en la popularidad de las películas según su idioma original?
+En este análisis se consideran únicamente los idiomas más frecuentes en el conjunto de datos,
+con el fin de evitar sesgos causados por idiomas con muy pocas observaciones.
+
+```{r}
+# Seleccionar los 5 idiomas más frecuentes
+top_languages <- movies_clean %>%
+  group_by(originalLanguage) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 5)
+```
+
+```{r}
+# Filtrar solo películas en esos idiomas
+movies_lang <- movies_clean %>%
+  filter(originalLanguage %in% top_languages$originalLanguage)
+```
+
+```{r}
+# Calcular popularidad promedio por idioma
+pop_lang <- movies_lang %>%
+  group_by(originalLanguage) %>%
+  summarise(popularidad_promedio = mean(popularity))
+```
+
+```{r}
+# Gráfico de barras
+ggplot(pop_lang, aes(
+  x = reorder(originalLanguage, -popularidad_promedio),
+  y = popularidad_promedio
+)) +
+  geom_col() +
+  labs(
+    x = "Idioma original",
+    y = "Popularidad promedio",
+    title = "Popularidad promedio según idioma original"
+  ) +
+  theme_minimal()
+```
+### 5.6 ¿El balance de género en el elenco influye en la popularidad de las películas?
+```{r}
+movies_gender <- movies_clean %>%
+  mutate(ratio_genero = castWomenAmount / castMenAmount) %>%
+  filter(is.finite(ratio_genero))
+```
+
+```{r}
+ggplot(movies_gender, aes(x = ratio_genero, y = popularity)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    x = "Ratio mujeres / hombres en el elenco",
+    y = "Popularidad",
+    title = "Relación entre balance de género y popularidad"
+  ) +
+  theme_minimal()
+```
+
