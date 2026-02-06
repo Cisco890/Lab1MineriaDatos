@@ -73,7 +73,7 @@ faltantes <- data.frame(
 head(faltantes, 15)  # Top 15 columnas con más NA
 
 # Duplicados (filas repetidas)
-sum(duplicated(datos))
+sum(duplicated(movies))
 
 ```
 #Resumen de variables Numéricas
@@ -100,5 +100,77 @@ head(res_num)
 cat_cols <- sapply(movies, is.character) | sapply(movies, is.factor)
 names(movies[, cat_cols])
 ```
+### Pregunta número 2
+```{r}
+variable_type <- data.frame(
+  Variable = names(movies),
+  Tipo = c(
+    "Cuantitativa discreta", "Cuantitativa continua", "Cuantitativa continua",
+    "Cuantitativa continua", "Cualitativa nominal", "Cualitativa nominal",
+    "Cualitativa nominal", "Cualitativa nominal", "Cualitativa nominal",
+    "Cualitativa nominal", "Cuantitativa continua", "Cualitativa nominal",
+    "Cuantitativa discreta", "Cualitativa nominal", "Cuantitativa discreta",
+    "Cualitativa nominal", "Cualitativa nominal", "Cuantitativa discreta",
+    "Cualitativa nominal", "Cuantitativa discreta", "Cuantitativa continua",
+    "Cualitativa nominal", "Cuantitativa continua", "Cualitativa nominal",
+    "Cuantitativa discreta", "Cuantitativa discreta", "Cuantitativa discreta",
+    "Cuantitativa discreta"
+  )
+)
 
+variable_type
+```
+###Pregunta número 3
+
+## Separar las variables
+```{r}
+vars_cuant <- variable_type$Variable[grepl("Cuantitativa", variable_type$Tipo)]
+vars_cual  <- variable_type$Variable[grepl("Cualitativa", variable_type$Tipo)]
+
+vars_cuant
+vars_cual
+```
+##normalizar
+```{r}
+library(dplyr)
+
+set.seed(123)
+
+normalidad_list <- lapply(vars_cuant, function(v){
+  x <- movies[[v]]
+  x <- x[!is.na(x)]
+  x <- x[is.finite(x)]   # por si hay Inf/NaN
+
+  n <- length(x)
+
+  if(n < 3){
+    return(data.frame(
+      Variable = v,
+      n = n,
+      muestra = n,
+      p_value = NA,
+      decision = "No aplica (n<3)"
+    ))
+  }
+
+  m <- min(n, 5000)
+  xs <- sample(x, m)
+
+  p <- shapiro.test(xs)$p.value
+  decision <- ifelse(p < 0.05, "Rechaza normalidad", "No rechaza normalidad")
+
+  data.frame(
+    Variable = v,
+    n = n,
+    muestra = m,
+    p_value = p,
+    decision = decision
+  )
+})
+
+normalidad <- bind_rows(normalidad_list) %>%
+  arrange(p_value)
+
+normalidad
+```
 

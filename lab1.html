@@ -491,7 +491,312 @@ head(movies)</code></pre>
 <pre><code>## [1] 28</code></pre>
 <pre class="r"><code>dim(movies) #dimensión del Data Set</code></pre>
 <pre><code>## [1] 19883    28</code></pre>
+<pre class="r"><code>names(movies) # Nombres de columna</code></pre>
+<pre><code>##  [1] &quot;id&quot;                        &quot;budget&quot;                   
+##  [3] &quot;genres&quot;                    &quot;homePage&quot;                 
+##  [5] &quot;productionCompany&quot;         &quot;productionCompanyCountry&quot; 
+##  [7] &quot;productionCountry&quot;         &quot;revenue&quot;                  
+##  [9] &quot;runtime&quot;                   &quot;video&quot;                    
+## [11] &quot;director&quot;                  &quot;actors&quot;                   
+## [13] &quot;actorsPopularity&quot;          &quot;actorsCharacter&quot;          
+## [15] &quot;originalTitle&quot;             &quot;title&quot;                    
+## [17] &quot;originalLanguage&quot;          &quot;popularity&quot;               
+## [19] &quot;releaseDate&quot;               &quot;voteAvg&quot;                  
+## [21] &quot;voteCount&quot;                 &quot;genresAmount&quot;             
+## [23] &quot;productionCoAmount&quot;        &quot;productionCountriesAmount&quot;
+## [25] &quot;actorsAmount&quot;              &quot;castWomenAmount&quot;          
+## [27] &quot;castMenAmount&quot;             &quot;releaseYear&quot;</code></pre>
+<pre class="r"><code>str(movies) # Estructura (tipos de datos)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    19883 obs. of  28 variables:
+##  $ id                       : int  1627085 1626914 1626898 1626808 1626678 1626234 1626010 1625551 1625043 1624457 ...
+##  $ budget                   : num  0 0 0 0 0 1 0 0 0 0 ...
+##  $ genres                   : chr  &quot;Drama|Crime&quot; &quot;Animation&quot; &quot;Animation&quot; &quot;Thriller|Mystery|Documentary&quot; ...
+##  $ homePage                 : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ productionCompany        : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ productionCompanyCountry : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ productionCountry        : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ revenue                  : num  0 0 0 0 0 1 0 0 0 0 ...
+##  $ runtime                  : int  95 3 2 5 12 14 39 90 96 106 ...
+##  $ video                    : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+##  $ director                 : chr  &quot;Javad Hakami&quot; &quot;Kimmy Gatewood&quot; &quot;Kimmy Gatewood&quot; &quot;Felipe Roldán&quot; ...
+##  $ actors                   : chr  &quot;Mohsen Ghasabian|Aida Mahiani|Mehran Ghafourian|Payam Ahmadinia|Masoud Karamati|Roya Javidnia|Nasim Adabi|Siavash Cheraghipour&quot; &quot;Kameron Jackson|Laura Weaving|sara weaving|Bertha Williams&quot; &quot;Cedric Mitchell|Cajun mills|Laura Williams&quot; &quot;Tomás Tuchsznajder|Matias Junas|Martin Etcheverry|Romeo Jeirfimczuk|Agustin Pulido|Alec Drach|Franco Serio&quot; ...
+##  $ actorsPopularity         : chr  &quot;0.3453|0.1664|0.9684|0.3437|0.3713|0.2437|0.2796|0.2639&quot; &quot;0|0.0071|0|0&quot; &quot;0.0193|0|0.0143&quot; &quot;0|0|0|0|0|0|0&quot; ...
+##  $ actorsCharacter          : chr  &quot;|||||||&quot; &quot;Prince Charming|Evil Stepmother|Fairy Godmother|Cinderella&quot; &quot;Aladdin|Jafar|Jasmine&quot; &quot;||||||&quot; ...
+##  $ originalTitle            : chr  &quot;غوطه ور&quot; &quot;Cinderella&quot; &quot;Aladdin&quot; &quot;EL ANILLO Y EL DECK&quot; ...
+##  $ title                    : chr  &quot;Immersed&quot; &quot;Cinderella&quot; &quot;Aladdin&quot; &quot;THE RING AND THE DECK&quot; ...
+##  $ originalLanguage         : chr  &quot;fa&quot; &quot;en&quot; &quot;en&quot; &quot;es&quot; ...
+##  $ popularity               : num  0.0357 0.0357 0.0214 0.0429 0.0379 ...
+##  $ releaseDate              : chr  &quot;2026-02-01&quot; &quot;2026-02-01&quot; &quot;2026-02-01&quot; &quot;2026-02-01&quot; ...
+##  $ voteAvg                  : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ voteCount                : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ genresAmount             : int  2 1 1 3 1 1 1 1 3 1 ...
+##  $ productionCoAmount       : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ productionCountriesAmount: int  0 0 0 0 0 0 0 1 1 0 ...
+##  $ actorsAmount             : int  8 4 3 7 3 3 5 4 5 5 ...
+##  $ castWomenAmount          : int  2 0 0 0 0 0 0 3 1 2 ...
+##  $ castMenAmount            : int  5 0 0 0 0 0 3 0 3 3 ...
+##  $ releaseYear              : int  2026 2026 2026 2026 2026 2026 2026 2026 2026 2026 ...</code></pre>
+<pre class="r"><code>summary(movies) # Resumen rápido (por defecto)</code></pre>
+<pre><code>##        id              budget             genres            homePage        
+##  Min.   :      5   Min.   :        0   Length:19883       Length:19883      
+##  1st Qu.: 146220   1st Qu.:        0   Class :character   Class :character  
+##  Median : 869623   Median :        0   Mode  :character   Mode  :character  
+##  Mean   : 902240   Mean   :  9413280                                        
+##  3rd Qu.:1589603   3rd Qu.:  1000000                                        
+##  Max.   :1627166   Max.   :380000000                                        
+##                                                                             
+##  productionCompany  productionCompanyCountry productionCountry 
+##  Length:19883       Length:19883             Length:19883      
+##  Class :character   Class :character         Class :character  
+##  Mode  :character   Mode  :character         Mode  :character  
+##                                                                
+##                                                                
+##                                                                
+##                                                                
+##     revenue             runtime         video           director        
+##  Min.   :0.000e+00   Min.   :  0.00   Mode :logical   Length:19883      
+##  1st Qu.:0.000e+00   1st Qu.: 10.00   FALSE:19313     Class :character  
+##  Median :0.000e+00   Median : 86.00   TRUE :84        Mode  :character  
+##  Mean   :2.879e+07   Mean   : 66.09   NA&#39;s :486                         
+##  3rd Qu.:3.306e+05   3rd Qu.:103.00                                     
+##  Max.   :2.847e+09   Max.   :750.00                                     
+##                                                                         
+##     actors          actorsPopularity   actorsCharacter    originalTitle     
+##  Length:19883       Length:19883       Length:19883       Length:19883      
+##  Class :character   Class :character   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+##                                                                             
+##                                                                             
+##                                                                             
+##                                                                             
+##     title           originalLanguage     popularity        releaseDate       
+##  Length:19883       Length:19883       Min.   :    0.000   Length:19883      
+##  Class :character   Class :character   1st Qu.:    0.055   Class :character  
+##  Mode  :character   Mode  :character   Median :    8.502   Mode  :character  
+##                                        Mean   :   26.249                     
+##                                        3rd Qu.:   22.239                     
+##                                        Max.   :11474.647                     
+##                                                                              
+##     voteAvg         voteCount        genresAmount    productionCoAmount
+##  Min.   : 0.000   Min.   :    0.0   Min.   : 0.000   Min.   : 0.000    
+##  1st Qu.: 0.000   1st Qu.:    0.0   1st Qu.: 1.000   1st Qu.: 0.000    
+##  Median : 5.400   Median :    6.0   Median : 2.000   Median : 1.000    
+##  Mean   : 3.837   Mean   :  675.9   Mean   : 1.949   Mean   : 1.973    
+##  3rd Qu.: 6.800   3rd Qu.:  423.0   3rd Qu.: 3.000   3rd Qu.: 3.000    
+##  Max.   :10.000   Max.   :30788.0   Max.   :16.000   Max.   :89.000    
+##                                                                        
+##  productionCountriesAmount  actorsAmount    castWomenAmount  castMenAmount   
+##  Min.   :  0.00            Min.   :     0   Min.   :     0   Min.   :     0  
+##  1st Qu.:  1.00            1st Qu.:     3   1st Qu.:     0   1st Qu.:     0  
+##  Median :  1.00            Median :     9   Median :     2   Median :     3  
+##  Mean   :  1.23            Mean   :  1082   Mean   :  3516   Mean   :  8224  
+##  3rd Qu.:  1.00            3rd Qu.:    21   3rd Qu.:     6   3rd Qu.:    12  
+##  Max.   :155.00            Max.   :919590   Max.   :922162   Max.   :922017  
+##                                             NA&#39;s   :37       NA&#39;s   :162     
+##   releaseYear  
+##  Min.   :1902  
+##  1st Qu.:2013  
+##  Median :2021  
+##  Mean   :2017  
+##  3rd Qu.:2025  
+##  Max.   :2026  
+##  NA&#39;s   :2</code></pre>
+<p>#Datos Faltantes y Duplicados</p>
+<pre class="r"><code># Cantidad de NA por columna
+na_conteo &lt;- colSums(is.na(movies))
+
+# Porcentaje de NA por columna
+na_porcentaje &lt;- round(colMeans(is.na(movies)) * 100, 2)
+
+# Tabla resumen de faltantes
+faltantes &lt;- data.frame(
+  variable = names(movies),
+  na = as.vector(na_conteo),
+  na_pct = as.vector(na_porcentaje)
+)
+
+
+head(faltantes, 15)  # Top 15 columnas con más NA</code></pre>
+<pre><code>##                    variable   na na_pct
+## 1                        id    0   0.00
+## 2                    budget    0   0.00
+## 3                    genres    0   0.00
+## 4                  homePage 5800  29.17
+## 5         productionCompany    0   0.00
+## 6  productionCompanyCountry  247   1.24
+## 7         productionCountry    0   0.00
+## 8                   revenue    0   0.00
+## 9                   runtime    0   0.00
+## 10                    video  486   2.44
+## 11                 director    0   0.00
+## 12                   actors    0   0.00
+## 13         actorsPopularity    0   0.00
+## 14          actorsCharacter    0   0.00
+## 15            originalTitle    0   0.00</code></pre>
+<pre class="r"><code># Duplicados (filas repetidas)
+sum(duplicated(movies))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<p>#Resumen de variables Numéricas</p>
+<pre class="r"><code># Detectar columnas numéricas
+num_cols &lt;- sapply(movies, is.numeric)
+datos_num &lt;- movies[, num_cols]
+
+# Resumen estadístico simple por variable numérica
+res_num &lt;- data.frame(
+  variable = names(datos_num),
+  media = sapply(datos_num, mean, na.rm = TRUE),
+  mediana = sapply(datos_num, median, na.rm = TRUE),
+  sd = sapply(datos_num, sd, na.rm = TRUE),
+  min = sapply(datos_num, min, na.rm = TRUE),
+  max = sapply(datos_num, max, na.rm = TRUE)
+)
+
+head(res_num)</code></pre>
+<pre><code>##              variable        media    mediana           sd min          max
+## id                 id 9.022402e+05 869623.000 6.848978e+05   5 1.627166e+06
+## budget         budget 9.413280e+06      0.000 2.774781e+07   0 3.800000e+08
+## revenue       revenue 2.879213e+07      0.000 1.109805e+08   0 2.847246e+09
+## runtime       runtime 6.609380e+01     86.000 5.008905e+01   0 7.500000e+02
+## popularity popularity 2.624884e+01      8.502 1.560672e+02   0 1.147465e+04
+## voteAvg       voteAvg 3.837069e+00      5.400 3.397705e+00   0 1.000000e+01</code></pre>
+<p>#variables Categóricas</p>
+<pre class="r"><code>cat_cols &lt;- sapply(movies, is.character) | sapply(movies, is.factor)
+names(movies[, cat_cols])</code></pre>
+<pre><code>##  [1] &quot;genres&quot;                   &quot;homePage&quot;                
+##  [3] &quot;productionCompany&quot;        &quot;productionCompanyCountry&quot;
+##  [5] &quot;productionCountry&quot;        &quot;director&quot;                
+##  [7] &quot;actors&quot;                   &quot;actorsPopularity&quot;        
+##  [9] &quot;actorsCharacter&quot;          &quot;originalTitle&quot;           
+## [11] &quot;title&quot;                    &quot;originalLanguage&quot;        
+## [13] &quot;releaseDate&quot;</code></pre>
 </div>
+<div id="pregunta-número-2" class="section level3">
+<h3>Pregunta número 2</h3>
+<pre class="r"><code>variable_type &lt;- data.frame(
+  Variable = names(movies),
+  Tipo = c(
+    &quot;Cuantitativa discreta&quot;, &quot;Cuantitativa continua&quot;, &quot;Cuantitativa continua&quot;,
+    &quot;Cuantitativa continua&quot;, &quot;Cualitativa nominal&quot;, &quot;Cualitativa nominal&quot;,
+    &quot;Cualitativa nominal&quot;, &quot;Cualitativa nominal&quot;, &quot;Cualitativa nominal&quot;,
+    &quot;Cualitativa nominal&quot;, &quot;Cuantitativa continua&quot;, &quot;Cualitativa nominal&quot;,
+    &quot;Cuantitativa discreta&quot;, &quot;Cualitativa nominal&quot;, &quot;Cuantitativa discreta&quot;,
+    &quot;Cualitativa nominal&quot;, &quot;Cualitativa nominal&quot;, &quot;Cuantitativa discreta&quot;,
+    &quot;Cualitativa nominal&quot;, &quot;Cuantitativa discreta&quot;, &quot;Cuantitativa continua&quot;,
+    &quot;Cualitativa nominal&quot;, &quot;Cuantitativa continua&quot;, &quot;Cualitativa nominal&quot;,
+    &quot;Cuantitativa discreta&quot;, &quot;Cuantitativa discreta&quot;, &quot;Cuantitativa discreta&quot;,
+    &quot;Cuantitativa discreta&quot;
+  )
+)
+
+variable_type</code></pre>
+<pre><code>##                     Variable                  Tipo
+## 1                         id Cuantitativa discreta
+## 2                     budget Cuantitativa continua
+## 3                     genres Cuantitativa continua
+## 4                   homePage Cuantitativa continua
+## 5          productionCompany   Cualitativa nominal
+## 6   productionCompanyCountry   Cualitativa nominal
+## 7          productionCountry   Cualitativa nominal
+## 8                    revenue   Cualitativa nominal
+## 9                    runtime   Cualitativa nominal
+## 10                     video   Cualitativa nominal
+## 11                  director Cuantitativa continua
+## 12                    actors   Cualitativa nominal
+## 13          actorsPopularity Cuantitativa discreta
+## 14           actorsCharacter   Cualitativa nominal
+## 15             originalTitle Cuantitativa discreta
+## 16                     title   Cualitativa nominal
+## 17          originalLanguage   Cualitativa nominal
+## 18                popularity Cuantitativa discreta
+## 19               releaseDate   Cualitativa nominal
+## 20                   voteAvg Cuantitativa discreta
+## 21                 voteCount Cuantitativa continua
+## 22              genresAmount   Cualitativa nominal
+## 23        productionCoAmount Cuantitativa continua
+## 24 productionCountriesAmount   Cualitativa nominal
+## 25              actorsAmount Cuantitativa discreta
+## 26           castWomenAmount Cuantitativa discreta
+## 27             castMenAmount Cuantitativa discreta
+## 28               releaseYear Cuantitativa discreta</code></pre>
+<p>###Pregunta número 3</p>
+</div>
+</div>
+<div id="separar-las-variables" class="section level2">
+<h2>Separar las variables</h2>
+<pre class="r"><code>vars_cuant &lt;- variable_type$Variable[grepl(&quot;Cuantitativa&quot;, variable_type$Tipo)]
+vars_cual  &lt;- variable_type$Variable[grepl(&quot;Cualitativa&quot;, variable_type$Tipo)]
+
+vars_cuant</code></pre>
+<pre><code>##  [1] &quot;id&quot;                 &quot;budget&quot;             &quot;genres&quot;            
+##  [4] &quot;homePage&quot;           &quot;director&quot;           &quot;actorsPopularity&quot;  
+##  [7] &quot;originalTitle&quot;      &quot;popularity&quot;         &quot;voteAvg&quot;           
+## [10] &quot;voteCount&quot;          &quot;productionCoAmount&quot; &quot;actorsAmount&quot;      
+## [13] &quot;castWomenAmount&quot;    &quot;castMenAmount&quot;      &quot;releaseYear&quot;</code></pre>
+<pre class="r"><code>vars_cual</code></pre>
+<pre><code>##  [1] &quot;productionCompany&quot;         &quot;productionCompanyCountry&quot; 
+##  [3] &quot;productionCountry&quot;         &quot;revenue&quot;                  
+##  [5] &quot;runtime&quot;                   &quot;video&quot;                    
+##  [7] &quot;actors&quot;                    &quot;actorsCharacter&quot;          
+##  [9] &quot;title&quot;                     &quot;originalLanguage&quot;         
+## [11] &quot;releaseDate&quot;               &quot;genresAmount&quot;             
+## [13] &quot;productionCountriesAmount&quot;</code></pre>
+<p>##normalizar</p>
+<pre class="r"><code>library(dplyr)
+
+set.seed(123)
+
+normalidad_list &lt;- lapply(vars_cuant, function(v){
+  x &lt;- movies[[v]]
+  x &lt;- x[!is.na(x)]
+  x &lt;- x[is.finite(x)]   # por si hay Inf/NaN
+
+  n &lt;- length(x)
+
+  if(n &lt; 3){
+    return(data.frame(
+      Variable = v,
+      n = n,
+      muestra = n,
+      p_value = NA,
+      decision = &quot;No aplica (n&lt;3)&quot;
+    ))
+  }
+
+  m &lt;- min(n, 5000)
+  xs &lt;- sample(x, m)
+
+  p &lt;- shapiro.test(xs)$p.value
+  decision &lt;- ifelse(p &lt; 0.05, &quot;Rechaza normalidad&quot;, &quot;No rechaza normalidad&quot;)
+
+  data.frame(
+    Variable = v,
+    n = n,
+    muestra = m,
+    p_value = p,
+    decision = decision
+  )
+})
+
+normalidad &lt;- bind_rows(normalidad_list) %&gt;%
+  arrange(p_value)
+
+normalidad</code></pre>
+<pre><code>##              Variable     n muestra      p_value           decision
+## 1        actorsAmount 19883    5000 1.499544e-95 Rechaza normalidad
+## 2     castWomenAmount 19846    5000 1.228362e-94 Rechaza normalidad
+## 3          popularity 19883    5000 5.605302e-94 Rechaza normalidad
+## 4       castMenAmount 19721    5000 1.708526e-93 Rechaza normalidad
+## 5           voteCount 19883    5000 1.383272e-85 Rechaza normalidad
+## 6              budget 19883    5000 1.240920e-84 Rechaza normalidad
+## 7         releaseYear 19881    5000 3.281946e-69 Rechaza normalidad
+## 8                  id 19883    5000 1.361023e-63 Rechaza normalidad
+## 9  productionCoAmount 19883    5000 3.382288e-62 Rechaza normalidad
+## 10            voteAvg 19883    5000 3.705534e-62 Rechaza normalidad
+## 11             genres     0       0           NA    No aplica (n&lt;3)
+## 12           homePage     0       0           NA    No aplica (n&lt;3)
+## 13           director     0       0           NA    No aplica (n&lt;3)
+## 14   actorsPopularity     0       0           NA    No aplica (n&lt;3)
+## 15      originalTitle     0       0           NA    No aplica (n&lt;3)</code></pre>
 </div>
 </div>
 
