@@ -247,7 +247,7 @@ ggplot(peliculas_por_anio, aes(x = releaseYear, y = cantidad)) +
     size = 3.5
   ) +
   scale_x_continuous(
-    breaks = seq(min(pelis_por_anio$releaseYear), max(pelis_por_anio$releaseYear), by = 5)
+    breaks = seq(min(peliculas_por_anio$releaseYear), max(peliculas_por_anio$releaseYear), by = 5)
   ) +
   scale_y_continuous(labels = comma) +
   labs(
