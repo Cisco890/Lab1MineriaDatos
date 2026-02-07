@@ -19,6 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(nortest)
 library(ggplot2)
 library(dplyr)
+library(stringr)
 library(cluster) #Para calcular la silueta
 library(e1071)#para cmeans
 library(mclust) #mixtures of gaussians
@@ -886,6 +887,69 @@ kruskal.test(popularity ~ estrategia, data = movies_mkt)
 ```{r}
 kruskal.test(revenue ~ estrategia, data = df_rev_plot)
 
+```
+####4.16
+```{r}
+##limpieza de datos
+extraer_numeros <- function(s){
+  nums <- str_extract_all(s, "[0-9]+\\.?[0-9]*")[[1]]
+  as.numeric(nums)
+}
+
+movies_pop <- movies %>%
+  mutate(
+    actor_pop_nums = lapply(actorsPopularity, extraer_numeros),
+    avg_actor_pop = sapply(actor_pop_nums, function(x) if(length(x)==0) NA else mean(x, na.rm=TRUE)),
+    max_actor_pop = sapply(actor_pop_nums, function(x) if(length(x)==0) NA else max(x, na.rm=TRUE))
+  )
+
+summary(movies_pop$avg_actor_pop)
+summary(movies_pop$max_actor_pop)
+```
+```{r}
+## correlacion
+df_pop_rev <- movies_pop %>%
+  filter(!is.na(revenue), revenue > 0) %>%
+  filter(!is.na(avg_actor_pop))
+
+
+cor_avg <- cor.test(df_pop_rev$avg_actor_pop, df_pop_rev$revenue, method = "spearman")
+cor_max <- cor.test(df_pop_rev$max_actor_pop, df_pop_rev$revenue, method = "spearman")
+
+cor_avg
+cor_max
+```
+```{r}
+##grafico con el promedio popularidad del elenco
+ggplot(df_pop_rev, aes(x = avg_actor_pop, y = revenue)) +
+  geom_point(alpha = 0.25) +
+  scale_y_log10() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Popularidad promedio del elenco vs éxito de taquilla",
+    subtitle = "Eje Y en log10 (revenue)",
+    x = "Popularidad promedio del elenco (avg_actor_pop)",
+    y = "Ingresos (revenue)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold"))
+```
+```{r}
+##grafico con el máximo del elenco
+ggplot(df_pop_rev, aes(x = max_actor_pop, y = revenue)) +
+  geom_point(alpha = 0.25) +
+  scale_y_log10() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Popularidad máxima del elenco vs éxito de taquilla",
+    subtitle = "Eje Y en log10 (revenue)",
+    x = "Popularidad máxima del elenco (max_actor_pop)",
+    y = "Ingresos (revenue)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold"))
 ```
 
 
