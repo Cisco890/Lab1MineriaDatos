@@ -1,11 +1,12 @@
 ---
-title: "Lab 1"
-output: html_document
 date: "2026-01-16"
 author: "Mario Fernando Rocha 23501, Luis Pedro Lira 23669,Juan Francisco Martínez 23617"
-```{r}
+title: "Lab 1"
+output:
+  pdf_document:
+    latex_engine: xelatex
 
-```
+
 
 ---
 ```{r}
@@ -13,27 +14,22 @@ author: "Mario Fernando Rocha 23501, Luis Pedro Lira 23669,Juan Francisco Martí
 ```
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-```{r paquetes}
+knitr::opts_chunk$set(
+  echo = TRUE,        # muestra el código
+  message = FALSE,    # NO muestra "Attaching package"
+  warning = FALSE,    # NO muestra warnings
+  results = "hide"    # NO imprime outputs enormes por defecto
+)
+
 library(nortest)
 library(ggplot2)
 library(dplyr)
 library(stringr)
-library(cluster) #Para calcular la silueta
-library(e1071)#para cmeans
-library(mclust) #mixtures of gaussians
-library(fpc) #para hacer el plotcluster
-library(NbClust) #Para determinar el número de clusters óptimo
-library(factoextra) #Para hacer gráficos bonitos de clustering
-library(hopkins) #Para revisar si vale la pena hacer agrupamiento
-library(GGally) #Para hacer el conjunto de graficos
-library(FeatureImpCluster) #Para revisar la importancia de las variables en los grupos.
-library(pheatmap) #Para hacer mapa de calor
-library(scales)  #Para las escalas de la gráficas
-library(lubridate)#para las fechas
+library(lubridate)
+library(scales)
 
 ```
+
 
 #  Análisis exploratorio de Datos
 
@@ -41,26 +37,24 @@ library(lubridate)#para las fechas
 
 ```{r carga_datos}
 movies <- read.csv("movies_2026.csv")
-head(movies)
 
 ```
 ### Pregunta 1:  Exploración rápida de los Datos
 
 #Dimensiones
-```{r}
-nrow(movies) #númdro de Filas 
-ncol(movies) #número de Columnas
-dim(movies) #dimensión del Data Set
 
-
-names(movies) # Nombres de columna
-
-
-str(movies) # Estructura (tipos de datos)
-
-
-summary(movies) # Resumen rápido (por defecto)
+### ✅ Cambia SOLO el encabezado del chunk:
+```r
+```{r, results="hide"}
+nrow(movies)
+ncol(movies)
+dim(movies)
+names(movies)
+str(movies)
+summary(movies)
 ```
+
+
 #Datos Faltantes y Duplicados
 ```{r}
 # Cantidad de NA por columna
@@ -83,6 +77,19 @@ head(faltantes, 15)  # Top 15 columnas con más NA
 sum(duplicated(movies))
 
 ```
+
+### Dimension del conjunto de datos 
+El conjunto de datos está compuesto por 19,883 observaciones y 28 variables, lo que representa un volumen considerable de información. Este tamaño permite realizar un análisis exploratorio robusto y obtener conclusiones generales representativas del comportamiento de la industria cinematográfica.
+
+### Estructura del data set 
+El dataset presenta una combinación de variables cuantitativas y cualitativas, lo que permite analizar tanto aspectos financieros y de popularidad como características narrativas, de producción y distribución de las películas.
+
+### Presupuesto
+El dataset presenta una combinación de variables cuantitativas y cualitativas, lo que permite analizar tanto aspectos financieros y de popularidad como características narrativas, de producción y distribución de las películas.
+
+
+
+
 #Resumen de variables Numéricas
 ```{r}
 # Detectar columnas numéricas
@@ -127,6 +134,19 @@ variable_type <- data.frame(
 
 variable_type
 ```
+**Interpretación**
+
+Las variables del conjunto de datos se clasifican en cuantitativas y cualitativas.
+Las variables cuantitativas incluyen tanto variables continuas, relacionadas con
+aspectos financieros y de popularidad, como variables discretas asociadas a
+conteos y características de producción. Por otro lado, las variables cualitativas
+son mayoritariamente de tipo nominal y describen atributos narrativos, de idioma,
+elenco y producción de las películas. Esta diversidad de tipos de variables permite
+realizar distintos análisis descriptivos y comparativos a lo largo del estudio.
+
+
+
+
 ###Pregunta número 3
 
 ## Separar las variables
@@ -179,6 +199,11 @@ normalidad <- bind_rows(normalidad_list) %>%
 
 normalidad
 ```
+***Normalidad de las variables cuantitativas***
+
+Los resultados de la prueba de Shapiro–Wilk muestran que todas las variables cuantitativas analizadas presentan valores p inferiores a 0.05, por lo que se rechaza la hipótesis de normalidad en todos los casos. Este resultado indica que las variables no siguen una distribución normal, lo cual es consistente con la exploración inicial del conjunto de datos, donde se observaron distribuciones altamente asimétricas y la presencia de valores extremos. En consecuencia, para los análisis posteriores se emplean métodos descriptivos y no paramétricos.
+
+
 ##Pregunta 4
 
 ###Top 10 películas con más presupuesto
@@ -191,6 +216,10 @@ top10_budget <- movies %>%
 
 top10_budget
 ```
+**Interpretación**
+Las diez películas con mayor presupuesto corresponden principalmente a franquicias reconocidas y producciones de gran escala. Esto refleja una estrategia de alta inversión por parte de los estudios, enfocada en películas con alto potencial comercial y amplio alcance internacional.
+
+
 ###Top 10 películas con más ingresos
 ```{r}
 top10_revenue <- movies %>%
@@ -201,6 +230,11 @@ top10_revenue <- movies %>%
 
 top10_revenue
 ```
+**Interpretación**
+Las películas con mayores ingresos corresponden a producciones altamente populares y con distribución global. Si bien existe coincidencia entre películas con alto presupuesto y altos ingresos, no todas las producciones costosas garantizan un éxito financiero equivalente, lo que sugiere la influencia de otros factores como recepción del público y estrategia de marketing.
+
+
+
 ### Película con más votos
 ```{r}
 pelicula_mas_votos <- movies %>%
@@ -211,6 +245,10 @@ pelicula_mas_votos <- movies %>%
 
 pelicula_mas_votos
 ```
+**Interpretación**
+La película con mayor número de votos es “Inception”, lo que indica una alta participación del público y un interés sostenido a lo largo del tiempo. Su elevada calificación promedio sugiere que, además de ser ampliamente vista, fue bien recibida por los usuarios.
+
+
 ### Película con menos votos
 ```{r}
 peliculas_0_votos <- movies %>%
@@ -231,17 +269,25 @@ peliculas_menos_votos_con_voto <- movies %>%
 min_votos_pos
 peliculas_menos_votos_con_voto
 ```
+**Interpretación**
+Las películas con menor número de votos no permiten identificar de manera confiable la “peor película”, ya que una sola votación no es representativa de la percepción general del público. Por esta razón, las calificaciones con muy pocos votos deben interpretarse con cautela y no se consideran concluyentes.
+
+
 ###Películas por año
 ```{r}
+library(dplyr)
+library(ggplot2)
+library(scales)
+
 peliculas_por_anio <- movies %>%
   filter(!is.na(releaseYear)) %>%
   mutate(releaseYear = as.integer(releaseYear)) %>%
-  count(releaseYear, name = "cantidad") %>%
+  group_by(releaseYear) %>%
+  summarise(cantidad = n()) %>%
   arrange(releaseYear)
 
 anio_mas <- peliculas_por_anio %>%
-  slice_max(cantidad, n = 1, with_ties = FALSE)
-
+  filter(cantidad == max(cantidad))
 ggplot(peliculas_por_anio, aes(x = releaseYear, y = cantidad)) +
   geom_col(width = 0.85) +
   geom_text(
@@ -251,7 +297,11 @@ ggplot(peliculas_por_anio, aes(x = releaseYear, y = cantidad)) +
     size = 3.5
   ) +
   scale_x_continuous(
-    breaks = seq(min(peliculas_por_anio$releaseYear), max(peliculas_por_anio$releaseYear), by = 5)
+    breaks = seq(
+      min(peliculas_por_anio$releaseYear),
+      max(peliculas_por_anio$releaseYear),
+      by = 5
+    )
   ) +
   scale_y_continuous(labels = comma) +
   labs(
@@ -266,6 +316,17 @@ ggplot(peliculas_por_anio, aes(x = releaseYear, y = cantidad)) +
     plot.title = element_text(face = "bold")
   )
 ```
+**Interpretación**
+
+El gráfico de barras muestra la cantidad de películas producidas por año. Se observa
+un crecimiento muy marcado en la producción cinematográfica a partir de la década
+de 1990, con un incremento aún más pronunciado después del año 2000. El año con
+mayor cantidad de películas producidas corresponde a uno de los años más recientes,
+lo que refleja tanto el crecimiento de la industria audiovisual como una mayor
+disponibilidad de información para producciones modernas. En contraste, los años
+más antiguos presentan una cantidad significativamente menor de películas registradas.
+
+
 ###Género de películas
 ```{r}
 movies2 <- movies %>%
@@ -291,21 +352,46 @@ top20_recientes <- movies2 %>%
 
 top20_recientes
 ```
+**Interpretación**
+
+El análisis de las 20 películas más recientes muestra una diversidad considerable
+de géneros, lo que indica que las producciones actuales no se concentran en un solo
+tipo narrativo. Sin embargo, al analizar el conjunto de datos completo, se observa
+que el género Drama es el que predomina, seguido por otros géneros como Comedy,
+Action y Animation. Esto sugiere que, aunque existe variedad en los lanzamientos
+recientes, el drama continúa siendo un género central dentro de la industria
+cinematográfica.
+
+
 ####Género predominante
 ```{r}
 freq_genero <- movies2 %>%
-  count(main_genre, sort = TRUE) %>%
-  mutate(porcentaje = round(100*n/sum(n), 2))
+  group_by(main_genre) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) %>%
+  mutate(porcentaje = round(100 * n / sum(n), 2))
 
 freq_genero
 
-
 ```
+
+**Interpretación**
+
+El análisis de frecuencias muestra que el género Drama es el más predominante
+en el conjunto de datos, representando aproximadamente el 18.8% de las películas.
+Este resultado sugiere que las producciones cinematográficas tienden a concentrarse
+en narrativas dramáticas, seguidas por géneros como Comedy y Documentary. La presencia
+de la categoría “Sin género” se debe a registros con información incompleta y no altera
+la tendencia general observada.
+
+
 ####Género predominante
 ```{r}
 genero_predominante <- freq_genero %>% head(1)
 genero_predominante
 ```
+
+
 ####Gráfico de top 15 géneros
 ```{r}
 freq_top15 <- freq_genero %>% head(15)
@@ -324,6 +410,13 @@ ggplot(freq_top15, aes(x = reorder(main_genre, n), y = n)) +
     plot.title = element_text(face = "bold")
   )
 ```
+***Interpretación***
+
+El gráfico de los 15 géneros más frecuentes refuerza los resultados de la tabla
+de frecuencias, evidenciando que el género Drama lidera claramente el conjunto
+de datos, seguido por Comedy y Documentary. A partir de estos géneros se observa
+una disminución gradual en la cantidad de películas por categoría.
+
 ####Películas más largas 
 ```{r}
 top20_largas <- movies2 %>%
@@ -334,24 +427,67 @@ top20_largas <- movies2 %>%
 
 top20_largas
 ```
+**Interpretación**
+
+El análisis de las películas con mayor duración muestra la presencia de valores
+extremos, con duraciones que superan ampliamente el promedio habitual de una
+película. Estas producciones corresponden principalmente a contenidos especiales,
+como documentales extensos, registros históricos o producciones no convencionales.
+Este comportamiento explica la alta asimetría observada en la variable runtime
+durante la exploración inicial de los datos.
+
+
 ####Género de las películas más largas
+
+#### Género de las películas más largas
+
 ```{r}
+# Crear variable de género principal (primer género)
+movies2 <- movies2 %>%
+  mutate(
+    main_genre = ifelse(
+      is.na(genres) | genres == "",
+      "Sin género",
+      sapply(strsplit(as.character(genres), "\\|"), `[`, 1)
+    )
+  )
+
+# Crear top 50 películas más largas
 top50_largas <- movies2 %>%
   filter(!is.na(runtime), runtime > 0) %>%
   arrange(desc(runtime)) %>%
   head(50)
+```
 
+
+```{r}
 freq_genero_largas <- top50_largas %>%
-  count(main_genre, sort = TRUE) %>%
-  mutate(porcentaje = round(100*n/sum(n), 2))
+  group_by(main_genre) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) %>%
+  mutate(porcentaje = round(100 * n / sum(n), 2))
 
 freq_genero_largas
 ```
+
 ####Género predominante en las más largas
 ```{r}
 genero_top_largas <- freq_genero_largas %>% head(1)
 genero_top_largas
 ```
+**Interpretación**
+
+El análisis de las 50 películas con mayor duración muestra que estas se distribuyen
+entre varios géneros principales. El género Action presenta la mayor frecuencia,
+representando el 24% de las películas más largas, seguido por Drama y Music, cada
+uno con el 16%. Asimismo, una proporción relevante de películas aparece clasificada
+como “Sin género”, lo que se asocia a información incompleta en el conjunto de datos.
+Estos resultados indican que las películas de mayor duración no se concentran en un
+solo género, sino que corresponden a producciones diversas y, en muchos casos,
+contenidos especiales o no convencionales.
+
+
+
 ####Gráfico de los géneros predominantes en las películas más largas
 ```{r}
 ggplot(freq_genero_largas, aes(x = reorder(main_genre, n), y = n)) +
@@ -368,6 +504,14 @@ ggplot(freq_genero_largas, aes(x = reorder(main_genre, n), y = n)) +
     plot.title = element_text(face = "bold")
   )
 ```
+**Interpretación**
+
+El análisis de la ganancia promedio por género muestra que el género Animation es el
+que presenta el mayor beneficio promedio por película. Esto sugiere que, aunque el
+número de producciones animadas es menor en comparación con otros géneros, estas
+tienden a ser altamente rentables de manera individual.
+
+
 ####Género con más ganancias
 ```{r}
 movies_gan <- movies %>%
@@ -390,10 +534,18 @@ gan_por_genero <- movies_gan %>%
 
 gan_por_genero
 ```
+El análisis de la ganancia total indica que el género Action concentra la mayor
+cantidad de beneficios acumulados. Esto se explica principalmente por el alto número
+de películas producidas dentro de este género, lo que incrementa su ganancia total,
+aunque su rentabilidad promedio sea menor que la de otros géneros.
+
 ```{r}
 genero_mayor_promedio <- gan_por_genero %>% head(1)
 genero_mayor_promedio
 ```
+
+
+
 ```{r}
 genero_mayor_total <- gan_por_genero %>%
   arrange(desc(ganancia_total)) %>%
@@ -420,6 +572,11 @@ ggplot(top10_gan, aes(x = reorder(main_genre, ganancia_promedio), y = ganancia_p
     plot.title = element_text(face = "bold")
   )
 ```
+El gráfico de los 10 géneros con mayor ganancia promedio refuerza que Animation,
+Adventure y Family lideran en términos de rentabilidad promedio, mientras que géneros
+como Action y Comedy, aunque populares, presentan una ganancia promedio más moderada.
+
+
 #### Análisis de actores
 ```{r}
 ##limpiar datos
@@ -430,6 +587,9 @@ df_actores_ing <- movies %>%
 summary(df_actores_ing$actorsAmount)
 summary(df_actores_ing$revenue)
 ```
+
+
+
 ```{r}
 ##gráfico de relación entre cantidad de actores e ingresos
 ggplot(df_actores_ing, aes(x = actorsAmount, y = revenue)) +
@@ -446,6 +606,16 @@ ggplot(df_actores_ing, aes(x = actorsAmount, y = revenue)) +
   theme(panel.grid.minor = element_blank(),
         plot.title = element_text(face = "bold"))
 ```
+
+**Interpretación**
+
+El gráfico de dispersión muestra una alta variabilidad en los ingresos de las
+películas para cualquier cantidad de actores. Aunque se observa una ligera
+tendencia negativa en la línea de ajuste, la dispersión de los datos es elevada,
+lo que indica que la cantidad de actores no tiene una relación clara ni directa
+con los ingresos de las películas. Por lo tanto, no se encuentra evidencia
+suficiente para afirmar que un mayor número de actores implique mayores ingresos.
+
 
 
 ```{r}
@@ -466,6 +636,10 @@ actores_por_anio <- df_actores_anio %>%
 
 actores_por_anio
 ```
+
+
+
+
 ```{r}
 ##Gráfico de tendencia
 ggplot(actores_por_anio, aes(x = releaseYear, y = mediana_actores)) +
@@ -482,6 +656,17 @@ ggplot(actores_por_anio, aes(x = releaseYear, y = mediana_actores)) +
   theme(panel.grid.minor = element_blank(),
         plot.title = element_text(face = "bold"))
 ```
+**Interpretación**
+
+El análisis de la cantidad de actores a lo largo del tiempo, utilizando la mediana
+por año, no muestra un incremento sostenido en el número de actores en las películas.
+Por el contrario, la tendencia lineal sugiere una ligera disminución en la mediana
+de actores en producciones más recientes. Esto indica que, a lo largo del tiempo,
+no se han producido películas con elencos significativamente más grandes de manera
+sistemática.
+
+
+
 ```{r}
 ##Comparación de los últimos años con años recientes
 max_anio <- max(df_actores_anio$releaseYear, na.rm = TRUE)
@@ -499,6 +684,10 @@ comparacion <- df_actores_anio %>%
 corte
 comparacion
 ```
+
+
+
+
 ###Cantidad de hombres y mujeres en las películas
 ```{r}
 ##preparar datos
@@ -514,6 +703,19 @@ summary(df_cast$castWomenAmount)
 summary(df_cast$castMenAmount)
 summary(df_cast$pct_women)
 ```
+
+
+
+**Interpretación**
+
+La correlación de Spearman entre la cantidad de mujeres en el elenco y la
+popularidad de las películas es positiva y estadísticamente significativa
+(ρ = 0.57, p < 0.05). Esto indica que las películas con un mayor número de
+actrices tienden a presentar mayores niveles de popularidad. Sin embargo,
+este resultado debe interpretarse con cautela, ya que la cantidad de mujeres
+en el reparto puede estar asociada al tamaño total del elenco y a producciones
+de mayor escala.
+
 ```{r}
 # Popularidad vs cantidad de mujeres/hombres y proporción
 cor_pop_women <- cor.test(df_cast$castWomenAmount, df_cast$popularity, method = "spearman")
@@ -524,6 +726,15 @@ cor_pop_women
 cor_pop_men
 cor_pop_pctw
 ```
+**Interpretación**
+
+La correlación entre la cantidad de hombres en el elenco y la popularidad
+de las películas es positiva y estadísticamente significativa
+(ρ = 0.61, p < 0.05). Este resultado sugiere que películas con elencos más
+numerosos, independientemente del género de los actores, tienden a ser más
+populares.
+
+
 ```{r}
 ggplot(df_cast, aes(x = pct_women, y = popularity)) +
   geom_point(alpha = 0.3) +
@@ -537,12 +748,32 @@ ggplot(df_cast, aes(x = pct_women, y = popularity)) +
   theme(panel.grid.minor = element_blank(),
         plot.title = element_text(face = "bold"))
 ```
+**Interpretación**
+
+El gráfico de dispersión entre la proporción de mujeres en el elenco y la
+popularidad muestra una alta dispersión de los datos y una línea de tendencia
+prácticamente horizontal. Esto indica que no existe una relación clara entre el
+balance de género en el reparto y la popularidad de las películas. En consecuencia,
+la proporción de mujeres en el elenco no parece ser un factor determinante en la
+recepción del público.
+
+
 ```{r}
 df_cast_rev <- df_cast %>%
   filter(!is.na(revenue), revenue > 0)
 
 summary(df_cast_rev$revenue)
 ```
+**Interpretación**
+
+Las correlaciones de Spearman entre la cantidad de mujeres y hombres en el elenco
+y los ingresos de las películas son positivas y estadísticamente significativas.
+Esto sugiere que las películas con elencos más numerosos tienden a generar mayores
+ingresos. Sin embargo, estas relaciones deben interpretarse con cautela, ya que la
+cantidad de actores y actrices está estrechamente asociada al tamaño general de la
+producción y no necesariamente al género de los integrantes del reparto.
+
+
 ```{r}
 cor_rev_women <- cor.test(df_cast_rev$castWomenAmount, df_cast_rev$revenue, method = "spearman")
 cor_rev_men   <- cor.test(df_cast_rev$castMenAmount,   df_cast_rev$revenue, method = "spearman")
@@ -552,6 +783,15 @@ cor_rev_women
 cor_rev_men
 cor_rev_pctw
 ```
+**Interpretación**
+
+Al analizar la proporción de mujeres en el elenco en relación con los ingresos,
+la correlación obtenida es muy débil y cercana a cero, aunque estadísticamente
+significativa debido al gran tamaño del conjunto de datos. Este resultado indica
+que el balance de género en el reparto no tiene una relación relevante con el éxito
+comercial de las películas, una vez que se considera el tamaño total del elenco.
+
+
 ####20 mejores actores según las películas
 ```{r}
 top20_mejor_calif <- movies %>%
@@ -563,12 +803,30 @@ top20_mejor_calif <- movies %>%
 
 top20_mejor_calif
 ```
+**Interpretación**
+
+El listado de las 20 películas mejor calificadas muestra que las producciones con
+mayor calificación promedio suelen contar con un número considerable de votos,
+lo que refuerza la confiabilidad de la evaluación del público. En este grupo
+aparecen tanto películas clásicas ampliamente reconocidas como producciones
+más recientes, lo que sugiere que las altas calificaciones no dependen únicamente
+del año de estreno, sino de la recepción general de la audiencia.
+
+
 ```{r}
 directores_top20 <- top20_mejor_calif %>%
   distinct(director)
 
 directores_top20
 ```
+**Interpretación**
+
+El conjunto de directores asociados a las 20 películas mejor calificadas es diverso,
+con varios directores que aparecen una sola vez. Esto indica que no existe un único
+director dominante en este grupo, sino que la alta calificación puede alcanzarse
+desde distintos estilos de dirección y contextos cinematográficos.
+
+
 ####Correlación de presupuestos con ingresos
 ```{r}
 ##limpiar datos
@@ -579,6 +837,7 @@ df_br <- movies %>%
 summary(df_br$budget)
 summary(df_br$revenue)
 ```
+
 ```{r}
 ##histograma
 ggplot(df_br, aes(x = budget)) +
@@ -588,6 +847,16 @@ ggplot(df_br, aes(x = budget)) +
   theme(panel.grid.minor = element_blank(),
         plot.title = element_text(face = "bold"))
 ```
+**Interpretación**
+
+El histograma del presupuesto muestra una distribución fuertemente asimétrica hacia
+la derecha, con la mayoría de las películas concentradas en presupuestos bajos y un
+número reducido de producciones con presupuestos extremadamente altos. Este patrón
+es característico de la industria cinematográfica, donde pocas películas concentran
+grandes inversiones.
+
+
+
 ```{r}
 ggplot(df_br, aes(x = revenue)) +
   geom_histogram(bins = 30) +
@@ -596,6 +865,14 @@ ggplot(df_br, aes(x = revenue)) +
   theme(panel.grid.minor = element_blank(),
         plot.title = element_text(face = "bold"))
 ```
+**Interpretación**
+
+El histograma de los ingresos presenta una asimetría aún más marcada que la del
+presupuesto, evidenciando que la mayoría de las películas genera ingresos moderados
+o bajos, mientras que un pequeño grupo de producciones alcanza ingresos muy elevados.
+Esto refleja la naturaleza altamente concentrada del éxito comercial en la industria.
+
+
 ```{r}
 ggplot(df_br, aes(x = log10(revenue))) +
   geom_histogram(bins = 30) +
@@ -604,6 +881,14 @@ ggplot(df_br, aes(x = log10(revenue))) +
   theme(panel.grid.minor = element_blank(),
         plot.title = element_text(face = "bold"))
 ```
+**Interpretación**
+
+Al aplicar una transformación logarítmica a los ingresos, la distribución se vuelve
+más cercana a una forma simétrica. Esto facilita la visualización y el análisis de
+los datos, y confirma que la asimetría observada en la escala original se debe a la
+presencia de valores extremos.
+
+
 ```{r}
 ggplot(df_br, aes(x = budget, y = revenue)) +
   geom_point(alpha = 0.3) +
@@ -617,6 +902,16 @@ ggplot(df_br, aes(x = budget, y = revenue)) +
   theme(panel.grid.minor = element_blank(),
         plot.title = element_text(face = "bold"))
 ```
+**Interpretación**
+
+El gráfico de dispersión entre presupuesto e ingresos muestra una relación positiva:
+en general, las películas con mayor presupuesto tienden a generar mayores ingresos.
+Sin embargo, la dispersión de los puntos indica que un alto presupuesto no garantiza
+necesariamente un alto ingreso, lo que sugiere la influencia de otros factores como
+el género, la recepción del público o las estrategias de marketing.
+
+
+
 ####Meses de lanzamiento con ingresos
 ```{r}
 # Preparar datos con mes
@@ -660,6 +955,24 @@ ggplot(df_mes, aes(x = mes, y = revenue)) +
     plot.title = element_text(face = "bold")
   )
 ```
+**Interpretación**
+
+El análisis de los ingresos según el mes de lanzamiento muestra diferencias claras
+entre los distintos meses del año. A partir del boxplot y del resumen estadístico,
+se observa que los meses de junio, julio y diciembre presentan las mayores medianas
+de ingresos, destacando junio como el mes con la mediana más alta.
+
+Los meses de verano (junio y julio) y el cierre de año (diciembre) concentran tanto
+un mayor número de películas con ingresos como valores más elevados en términos
+medianos, lo que sugiere que estos periodos están asociados a un mejor desempeño
+comercial. En contraste, meses como septiembre y octubre presentan medianas de
+ingresos más bajas.
+
+La prueba de Kruskal–Wallis confirma que las diferencias en los ingresos entre los
+meses de lanzamiento son estadísticamente significativas (p < 0.05), lo que indica
+que el mes de estreno sí está asociado al desempeño comercial de las películas.
+
+
 ```{r}
 mes_mejor <- resumen_mes %>% head(1)
 mes_mejor
@@ -699,11 +1012,18 @@ ingresos_por_mes <- df_rev_mes %>%
 ingresos_por_mes
 
 ```
+
+Los resultados muestran que junio, julio y diciembre son los meses con mayores
+ingresos medianos, siendo junio el mes con mejor desempeño comercial.
+
 ```{r}
 ##top 3 mejores meses
 top3_meses <- ingresos_por_mes %>% head(3)
 top3_meses
 ```
+
+
+
 ```{r}
 ##Gráfico de ingresos por mes
 ggplot(ingresos_por_mes, aes(x = mes, y = revenue_mediana)) +
@@ -720,23 +1040,46 @@ ggplot(ingresos_por_mes, aes(x = mes, y = revenue_mediana)) +
     plot.title = element_text(face = "bold")
   )
 ```
+**Interpretación**
+
+El gráfico de la mediana de ingresos por mes de lanzamiento muestra que los meses
+de junio y julio presentan las mayores medianas de ingresos, seguidos por diciembre
+y noviembre. Esto sugiere que los lanzamientos realizados durante el verano y el
+cierre de año tienden a obtener un mejor desempeño comercial. En contraste, meses
+como septiembre y enero presentan medianas de ingresos más bajas, indicando un
+menor rendimiento relativo en esos periodos.
+
+
+
 ```{r}
 ## promedio de películas por mes
 lanz_por_anio_mes <- movies2 %>%
   filter(!is.na(release_dt)) %>%
   mutate(anio = year(release_dt)) %>%
-  count(anio, mes, name = "peliculas")
-
+  group_by(anio, mes) %>%
+  summarise(peliculas = n()) %>%
+  ungroup()
 promedio_por_mes_del_anio <- lanz_por_anio_mes %>%
   group_by(mes) %>%
   summarise(
     promedio_peliculas = mean(peliculas),
-    mediana_peliculas = median(peliculas)
+    mediana_peliculas  = median(peliculas)
   ) %>%
   arrange(desc(promedio_peliculas))
 
 promedio_por_mes_del_anio
 ```
+**Interpretación**
+
+El promedio de películas lanzadas por mes muestra que noviembre es el mes con mayor
+cantidad de estrenos en promedio a lo largo de los años, seguido por diciembre y
+enero. Esto sugiere que la industria cinematográfica concentra una mayor cantidad
+de lanzamientos hacia el cierre y el inicio del año. La diferencia observada entre
+el promedio y la mediana indica que existen algunos años con picos elevados de
+estrenos, particularmente en estos meses, mientras que en otros meses la cantidad
+de lanzamientos se mantiene más estable.
+
+
 ```{r}
 ##gráfico
 ggplot(promedio_por_mes_del_anio, aes(x = mes, y = promedio_peliculas)) +
@@ -752,6 +1095,16 @@ ggplot(promedio_por_mes_del_anio, aes(x = mes, y = promedio_peliculas)) +
     plot.title = element_text(face = "bold")
   )
 ```
+**Interpretación**
+
+El gráfico del promedio de películas lanzadas por mes muestra que noviembre es el
+mes con mayor cantidad de estrenos en promedio, seguido por diciembre y enero.
+Esto indica que la industria cinematográfica concentra una mayor actividad de
+lanzamientos hacia el cierre y el inicio del año. En contraste, meses como abril,
+mayo y febrero presentan promedios más bajos, lo que sugiere una menor intensidad
+de estrenos durante esos periodos.
+
+
 ####4.14
 ```{r}
 ##preparar datos
@@ -770,6 +1123,8 @@ summary(df_calif$voteCount)
 cor_spear <- cor.test(df_calif$voteAvg, df_calif$revenue, method = "spearman")
 cor_spear
 ```
+
+
 ```{r}
 ##grafico
 ggplot(df_calif, aes(x = voteAvg, y = revenue)) +
@@ -789,6 +1144,19 @@ ggplot(df_calif, aes(x = voteAvg, y = revenue)) +
   )
 
 ```
+**Interpretación**
+
+La correlación de Spearman entre la calificación promedio de los usuarios y los
+ingresos de las películas es positiva pero débil (ρ ≈ 0.11), aunque estadísticamente
+significativa. El gráfico de dispersión muestra una ligera tendencia ascendente,
+lo que indica que películas mejor calificadas tienden a generar mayores ingresos
+en promedio. Sin embargo, la alta dispersión de los datos sugiere que la calificación
+por sí sola no es un factor determinante del éxito comercial.
+
+Las calificaciones muestran una relación positiva débil con los ingresos, lo que
+sugiere que una buena recepción del público ayuda al desempeño comercial, pero no
+lo garantiza.
+
 ```{r}
 ## exito como gancia
 df_gan <- movies %>%
@@ -800,6 +1168,8 @@ df_gan <- movies %>%
 cor_gan <- cor.test(df_gan$voteAvg, df_gan$ganancia, method = "spearman")
 cor_gan
 ```
+
+
 ###4.15
 ```{r}
 ##limpieza de datos
@@ -861,6 +1231,18 @@ ggplot(movies_mkt, aes(x = estrategia, y = log1p(popularity))) +
         axis.text.x = element_text(angle = 25, hjust = 1),
         plot.title = element_text(face = "bold"))
 ```
+**Interpretación**
+
+El boxplot de popularidad por estrategia de marketing muestra diferencias claras
+entre las categorías analizadas. Las películas que cuentan con algún tipo de
+estrategia de marketing digital (homepage, video o ambos) presentan niveles de
+popularidad considerablemente mayores que aquellas que no utilizan ninguna
+estrategia. En particular, las películas con homepage y las que combinan video
+con homepage muestran las medianas de popularidad más altas. Esto sugiere que
+la presencia de recursos promocionales en línea está asociada con una mayor
+visibilidad y atención del público.
+
+
 ```{r}
 ##grafico de ingresos por estrategia
 df_rev_plot <- movies_mkt %>%
@@ -880,6 +1262,17 @@ ggplot(df_rev_plot, aes(x = estrategia, y = revenue)) +
         axis.text.x = element_text(angle = 25, hjust = 1),
         plot.title = element_text(face = "bold"))
 ```
+**Interpretación**
+
+El boxplot de ingresos por estrategia de marketing indica que las películas que
+utilizan una homepage presentan una mediana de ingresos más alta en comparación
+con aquellas que no emplean ninguna estrategia de marketing. Si bien las categorías
+“Solo video” y “Video + homepage” cuentan con muy pocas observaciones, se observa
+que, en general, la presencia de una estrategia de marketing se asocia con mayores
+ingresos. La alta dispersión refleja que el marketing no garantiza el éxito comercial,
+pero sí parece contribuir positivamente al desempeño económico.
+
+
 ```{r}
 kruskal.test(popularity ~ estrategia, data = movies_mkt)
 
@@ -888,6 +1281,17 @@ kruskal.test(popularity ~ estrategia, data = movies_mkt)
 kruskal.test(revenue ~ estrategia, data = df_rev_plot)
 
 ```
+
+**Interpretación**
+
+Las pruebas de Kruskal–Wallis confirman que existen diferencias estadísticamente
+significativas tanto en la popularidad como en los ingresos entre las distintas
+estrategias de marketing (p < 0.05). Esto indica que el tipo de estrategia utilizada
+está asociado con resultados distintos en términos de visibilidad y desempeño
+comercial. No obstante, estas diferencias deben interpretarse con cautela, ya que
+algunas categorías presentan un número reducido de observaciones.
+
+
 ####4.16
 ```{r}
 ##limpieza de datos
@@ -935,6 +1339,16 @@ ggplot(df_pop_rev, aes(x = avg_actor_pop, y = revenue)) +
   theme(panel.grid.minor = element_blank(),
         plot.title = element_text(face = "bold"))
 ```
+**Interpretación**
+
+El gráfico de dispersión entre la popularidad promedio del elenco y los ingresos
+de las películas muestra una relación positiva clara. La línea de tendencia indica
+que, en promedio, las películas con elencos más populares tienden a generar mayores
+ingresos. Aunque existe una alta dispersión de los datos, el patrón general sugiere
+que la popularidad promedio del elenco está asociada con un mejor desempeño en taquilla.
+
+
+
 ```{r}
 ##grafico con el máximo del elenco
 ggplot(df_pop_rev, aes(x = max_actor_pop, y = revenue)) +
@@ -952,12 +1366,14 @@ ggplot(df_pop_rev, aes(x = max_actor_pop, y = revenue)) +
         plot.title = element_text(face = "bold"))
 ```
 
+**Interpretación**
 
-
-
-
-
-
+El gráfico que relaciona la popularidad máxima del elenco con los ingresos de las
+películas muestra una tendencia positiva aún más marcada. Esto sugiere que contar
+con al menos un actor o actriz de alta popularidad dentro del elenco puede estar
+asociado con un mayor éxito comercial. Sin embargo, la dispersión observada indica
+que la presencia de una estrella no garantiza ingresos elevados, sino que actúa como
+un factor complementario dentro del desempeño general de la película.
 
 
 
@@ -995,6 +1411,15 @@ ggplot(movies_clean, aes(x = factor(productionCountriesAmount), y = revenue)) +
   ) +
   theme_minimal()
 ```
+**Interpretación**
+
+El boxplot muestra que las películas producidas en uno o pocos países concentran
+la mayor cantidad de ingresos y presentan una alta variabilidad. No se observa una
+tendencia clara de que un mayor número de países de producción implique mayores
+ingresos; por el contrario, las coproducciones con muchos países son menos frecuentes
+y no destacan consistentemente por mayores ingresos.
+
+
 
 ### 5.2 ¿La cantidad de géneros influye en la popularidad y calificación de las películas?
 ```{r}
@@ -1008,6 +1433,17 @@ ggplot(movies_clean, aes(x = genresAmount, y = popularity)) +
   ) +
   theme_minimal()
 ```
+**Interpretación**
+
+El gráfico de dispersión entre la cantidad de géneros y la popularidad muestra una
+alta dispersión de los datos y una tendencia prácticamente horizontal. Esto indica
+que incluir más géneros en una película no se asocia de manera clara con un aumento
+en su popularidad. La mayoría de películas exitosas se concentra en uno o pocos
+géneros.
+
+
+
+
 ### 5.3 ¿Cómo ha cambiado la duración promedio de las películas a lo largo del tiempo?
 
 ```{r}
@@ -1025,6 +1461,16 @@ ggplot(runtime_year, aes(x = releaseYear, y = runtime_promedio)) +
   ) +
   theme_minimal()
 ```
+**Interpretación**
+
+La evolución de la duración promedio de las películas a lo largo del tiempo muestra
+variaciones importantes en los primeros años, seguidas de una estabilización en
+décadas más recientes alrededor de una duración cercana a los 100 minutos. Esto
+sugiere que, con el tiempo, la industria ha convergido hacia duraciones más estándar
+para los largometrajes.
+
+
+
 
 ### 5.4 ¿Las películas con más compañías productoras generan mayores ingresos?
 ```{r}
@@ -1037,6 +1483,16 @@ ggplot(movies_clean, aes(x = factor(productionCoAmount), y = revenue)) +
   ) +
   theme_minimal()
 ```
+**Interpretación**
+
+El boxplot indica que las películas con pocas compañías productoras concentran los
+mayores ingresos y presentan una gran variabilidad. No se observa una relación
+directa entre un mayor número de compañías productoras y mayores ingresos, lo que
+sugiere que la colaboración entre muchas compañías no garantiza un mejor desempeño
+comercial.
+
+
+
 ### 5.5 ¿Existen diferencias en la popularidad de las películas según su idioma original?
 En este análisis se consideran únicamente los idiomas más frecuentes en el conjunto de datos,
 con el fin de evitar sesgos causados por idiomas con muy pocas observaciones.
@@ -1077,6 +1533,16 @@ ggplot(pop_lang, aes(
   ) +
   theme_minimal()
 ```
+**Interpretación**
+
+El gráfico de barras muestra diferencias claras en la popularidad promedio según el
+idioma original de las películas. Algunos idiomas presentan valores promedio más
+altos de popularidad, lo que sugiere una mayor visibilidad o alcance internacional.
+Sin embargo, estas diferencias pueden estar influenciadas por el número de películas
+y el tamaño del mercado asociado a cada idioma.
+
+
+
 ### 5.6 ¿El balance de género en el elenco influye en la popularidad de las películas?
 ```{r}
 movies_gender <- movies_clean %>%
@@ -1095,3 +1561,16 @@ ggplot(movies_gender, aes(x = ratio_genero, y = popularity)) +
   ) +
   theme_minimal()
 ```
+**Interpretación**
+
+El gráfico que relaciona el ratio mujeres/hombres en el elenco con la popularidad
+muestra una alta concentración de películas con ratios bajos y una línea de tendencia
+prácticamente horizontal. Esto indica que el balance de género en el reparto no tiene
+una relación clara con la popularidad de las películas, reforzando que este factor
+no es determinante en la recepción del público.
+
+
+
+
+**LINK REPOSITORIO GITHUB**
+git@github.com:Cisco890/Lab1MineriaDatos.git
